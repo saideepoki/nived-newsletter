@@ -3,7 +3,6 @@ import mongoose, {Schema,Document} from "mongoose";
 export interface UserDocument extends Document {
     email: string;
     role: string;
-    createdAt: Date;
     verifyCode: string;
     verifyCodeExpiry: Date;
     isVerified: boolean;
@@ -19,10 +18,6 @@ const UserSchema: Schema<UserDocument> = new Schema({
  role: {
    type: String,
    default: 'user',
- },
- createdAt: {
-    type: Date,
-    default: Date.now,
  },
  verifyCode: {
     type: String,
