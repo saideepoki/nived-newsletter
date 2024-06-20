@@ -42,7 +42,9 @@ export async function POST(req: Request, res: Response) {
 
             await newUser.save();
         }
+
         const emailResponse = await sendVerificationEmail(email, verifyCode);
+
         if(!emailResponse.success) {
           return Response.json(
             {
@@ -61,7 +63,7 @@ export async function POST(req: Request, res: Response) {
                 message: 'Please verify you email to register yourself'
             },
             {
-                status: 400
+                status: 200
             }
         )
 
