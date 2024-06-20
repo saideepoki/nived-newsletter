@@ -2,8 +2,11 @@ import mongoose, {Schema,Document} from "mongoose";
 
 export interface UserDocument extends Document {
     email: string;
-    role: string,
+    role: string;
     createdAt: Date;
+    verifyCode: string;
+    verifyCodeExpiry: Date;
+    isVerified: boolean;
 }
 
 const UserSchema: Schema<UserDocument> = new Schema({
@@ -20,6 +23,18 @@ const UserSchema: Schema<UserDocument> = new Schema({
  createdAt: {
     type: Date,
     default: Date.now,
+ },
+ verifyCode: {
+    type: String,
+    required: [true, "Verify Code is required"]
+ },
+ verifyCodeExpiry: {
+    type: Date,
+    required: [true, "Verify Code Expiry is required"]
+ },
+ isVerified: {
+    type: Boolean,
+    default: false
  }
 });
 
