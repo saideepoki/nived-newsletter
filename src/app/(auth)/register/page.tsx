@@ -53,10 +53,10 @@ export default function Page() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-zinc-950 text-white p-6">
-      <div className="rounded-lg p-8 text-white w-full max-w-md">
+      <div className="bg-black rounded-large p-8 text-white w-full max-w-md">
         <div className="flex flex-col justify-center items-center mb-5">
           <h2 className="font-extrabold tracking-tight text-3xl mb-3 text-white">Join Our Newsletter!</h2>
-          <p className="text-white">Register now to receive the latest newsletters directly in your inbox.</p>
+          <p className="text-white text-center">Register now to receive the latest newsletters directly in your inbox.</p>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -81,7 +81,7 @@ export default function Page() {
             <div className="flex flex-col items-center">
               <Button
                 type="submit"
-                className="w-full"
+                className="w-[10rem]"
                 disabled={formSubmitting}
               >
                 Register

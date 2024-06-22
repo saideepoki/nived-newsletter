@@ -29,8 +29,7 @@ export async function POST(req: Request, res: Response) {
              await existingUserVerification.save();
            }
         } else {
-            const codeExpiry = new Date();
-            codeExpiry.setDate(codeExpiry.getHours() + 1);
+            const codeExpiry = new Date(Date.now() + 3600000);
 
             const newUser = new User({
                 email: email,
