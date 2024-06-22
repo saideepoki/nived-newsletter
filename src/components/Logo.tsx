@@ -1,6 +1,5 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem } from "@nextui-org/navbar";
+import { Navbar, NavbarBrand} from "@nextui-org/navbar";
 import Link from "next/link";
-import { Button } from "./ui/button";
 
 export default function Logo() {
     return (

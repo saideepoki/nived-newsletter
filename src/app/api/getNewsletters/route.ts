@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import NewsLetter from "@/model/newsletter";
 import { dbConnect } from "@/lib/dbConnect";
-import { authOptions } from "../auth/[...nextauth]/options";
-import { User } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function GET(req: Request) {
     await dbConnect();
@@ -49,6 +48,14 @@ export async function GET(req: Request) {
         }
      )
     } catch (error) {
-
+        return Response.json(
+            {
+                success: false,
+                message: "Error fetching All NewsLetters"
+            },
+            {
+                status: 401
+            }
+        )
     }
 }
