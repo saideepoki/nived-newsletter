@@ -1,7 +1,7 @@
 import User from "@/model/user";
 import { dbConnect } from "@/lib/dbConnect";
 import { sendNewsLetter } from "@/helpers/sendNewsletter";
-import Newsletter from "@/model/newsletter";
+import NewsLetter from "@/model/newsletter";
 
 export async function POST(req: Request): Promise<any> {
     await dbConnect();
@@ -9,7 +9,7 @@ export async function POST(req: Request): Promise<any> {
     try {
         const {title, content} = await req.json();
 
-        const newsLetter = new Newsletter({
+        const newsLetter = new NewsLetter({
             title: title,
             content: content,
             createdAt: Date.now()

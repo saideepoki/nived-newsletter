@@ -21,6 +21,6 @@ const NewsletterSchema: Schema<NewsletterDocument> = new Schema({
     },
 })
 
-const Newsletter = (mongoose.models.Newsletter) || (mongoose.model<NewsletterDocument>('NewsLetter',NewsletterSchema))
+const NewsLetter = (mongoose.models.NewsLetter) || (mongoose.model<NewsletterDocument>('NewsLetter',NewsletterSchema))
 
-export default Newsletter;
+export default NewsLetter;

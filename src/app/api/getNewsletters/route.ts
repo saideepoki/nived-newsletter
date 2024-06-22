@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import Newsletter from "@/model/newsletter";
+import NewsLetter from "@/model/newsletter";
 import { dbConnect } from "@/lib/dbConnect";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { User } from "next-auth";
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
         )
      }
 
-     const newsletters = await Newsletter.aggregate([
+     const newsletters = await NewsLetter.aggregate([
         {$match: {}},
         {$sort: {'createdAt': -1}}
      ])
