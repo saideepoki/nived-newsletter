@@ -4,7 +4,8 @@ type ConnectionObject  = {
     isConnected?: number
 }
 
-const connection: ConnectionObject = {}
+const connection: ConnectionObject = {};
+
 
 export async function dbConnect(): Promise<void> {
     if(connection.isConnected) {
@@ -12,8 +13,8 @@ export async function dbConnect(): Promise<void> {
         return;
     }
     try{
-       const db = await mongoose.connect(process.env.MONGODB_URI || '',{}); // connecting db
-       connection.isConnected = db.connections[0].readyState; // take connection from 
+       const db = await mongoose.connect(process.env.MONGODB_URI ?? "",{}); // connecting db
+       connection.isConnected = db.connections[0].readyState; // take connection from
        console.log("Database Connected Successfully");
        console.log(db.connections[0]);
     } catch(error) {
