@@ -6,7 +6,24 @@ export async function POST(req: Request, res: Response) {
     await dbConnect();
 
     try {
-        const {email} = await req.json();
+        const {username ,email} = await req.json();
+
+        const existingUserVerifiedByUsername = await User.findOne({
+            username,
+            isVerified: true
+        });
+
+        if(existingUserVerifiedByUsername) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "User already exists and verified"
+                },
+                {
+                    status: 500
+                }
+            )
+        }
 
         const existingUserVerification = await User.findOne({email});
 
@@ -16,7 +33,7 @@ export async function POST(req: Request, res: Response) {
              return Response.json(
                 {
                     success: false,
-                    message: "User already exists and verified"
+                    message: "email id already exists and verified"
                 },
                 {
                     status: 500
@@ -32,6 +49,7 @@ export async function POST(req: Request, res: Response) {
             const codeExpiry = new Date(Date.now() + 3600000);
 
             const newUser = new User({
+                username: username,
                 email: email,
                 role: 'user',
                 verifyCode: verifyCode,

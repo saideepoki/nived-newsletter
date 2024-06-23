@@ -1,6 +1,7 @@
 import mongoose, {Schema,Document} from "mongoose";
 
 export interface UserDocument extends Document {
+    username: string;
     email: string;
     role: string;
     verifyCode: string;
@@ -9,9 +10,14 @@ export interface UserDocument extends Document {
 }
 
 const UserSchema: Schema<UserDocument> = new Schema({
+ username: {
+   type: String,
+   required: [true, "Username is required"],
+   unique: true
+},
  email: {
   type: String,
-  required: [true, "username is required"],
+  required: [true, "Email is required"],
   unique: true,
   match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,"Please use a valid email address"],
  },

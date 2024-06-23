@@ -1,34 +1,60 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as z from 'zod';
 import { useToast } from "@/components/ui/use-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { loginSchema } from '@/schemas/loginSchema';
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from 'axios';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { ApiResponse } from '@/types/apiResponse';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { registerSchema } from '@/schemas/registerSchema';
+import { useDebounceCallback } from 'usehooks-ts'
 
 export default function Page() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [usernameMessage, setUsernameMessage] = useState('');
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
+  const debounced = useDebounceCallback(setUsername, 500);
   const { toast } = useToast();
   const router = useRouter();
   const form = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      username: "",
       email: "",
     }
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof loginSchema>> = async (data) => {
+  useEffect(() => {
+    async function checkUsername() {
+      if (username) {
+        setIsCheckingUsername(true);
+        setUsernameMessage('');
+        try {
+          const response = await axios.get(`/api/checkUsernameUnique?username=${username}`);
+          setUsernameMessage(response.data.message);
+        } catch (error) {
+          const axiosError = error as AxiosError<ApiResponse>;
+          const usernameError = axiosError.response?.data.message ?? "Error checking username";
+          setUsernameMessage(usernameError);
+        } finally {
+          setIsCheckingUsername(false);
+        }
+      }
+    }
+    checkUsername();
+
+  }, [username])
+
+  const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (data) => {
     setFormSubmitting(true);
     try {
       const response = await axios.post('/api/register', data);
@@ -62,6 +88,34 @@ export default function Page() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Username</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="username"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          debounced(e.target.value)}}
+                        className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      {isCheckingUsername && <Loader2 className='absolute right-2 top-2 h-5 w-5 animate-spin' />}
+                      <p className={`text-sm mt-1 ${usernameMessage === "Username is available" ? 'text-green-500' : 'text-red-500'}`}>
+                        {usernameMessage}
+                      </p>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -69,7 +123,7 @@ export default function Page() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="email"
                       {...field}
                       className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -95,11 +149,11 @@ export default function Page() {
             </div>
           </form>
         </Form>
-        <div className = "text-center mt-4">
+        <div className="text-center mt-4">
           <p>
             Already registered?{' '}
-            <Link href = "/sign-in" className = "text-zinc-500">
-            Log in
+            <Link href="/sign-in" className="text-zinc-500">
+              Log in
             </Link>
           </p>
         </div>
