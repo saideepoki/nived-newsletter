@@ -47,7 +47,7 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
     }
 
   return (
-    <div id= "featured-newsletters" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mx-5">
+    <div id= "featured-newsletters" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mx-5 justify-center">
       {featuredNewsletters.map((newsletter) => (
         <Card key={newsletter._id as string} className={`${cn("w-full", className)} bg-zinc-950`} {...props}>
           <CardHeader>

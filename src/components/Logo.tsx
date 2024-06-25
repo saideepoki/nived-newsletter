@@ -31,7 +31,7 @@ export default function Logo() {
                                     <DropdownMenuContent className="bg-zinc-950">
                                     <DropdownMenuLabel>{user?.username || user?.email}</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem className = "text-red-500" onClick = {() => signOut()}>
+                                    <DropdownMenuItem className = "text-red-500" onClick = {() => signOut({callbackUrl: "/"})}>
                                         Logout
                                     </DropdownMenuItem>
                                     </DropdownMenuContent>

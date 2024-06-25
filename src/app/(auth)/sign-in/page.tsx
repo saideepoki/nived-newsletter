@@ -29,43 +29,38 @@ export default function LoginPage() {
     const onSubmit: SubmitHandler<z.infer<typeof loginSchema>> = async (data) => {
         setFormSubmitting(true);
         try {
-            console.log("HII");
             const response = await signIn('credentials',{
-                redirected: false,
+                redirect: false,
                 identifier: data.identifier
             })
             console.log(response);
             if(response?.error) {
-              console.log("ekdewkbdewkbd");
-                if(response.error === "CredentialsSignin") {
                 toast({
                     title: "Login failed",
-                    description: "Incorrect username or password",
+                    description: "No user found with the email or username",
                     variant: "destructive"
                 })
-                console.log("HII3");
-              }
-              else {
-                console.log("wdwqdwq");
-                toast({
-                    title: "Login failed",
-                    description: response.error,
-                    variant: "destructive"
-                })
-              }
+                router.refresh();
+                console.log("refreshed");
             }
             if(response?.url) {
-                console.log("hello");
-                router.replace('/get-newsletters');
+                toast({
+                  title: "Login Success",
+                  description: "Redirecting to view Newsletters",
+                  variant: "default"
+              })
+                router.push('/get-newsletters');
             }
 
         } catch (error) {
-          console.log("werewrew");
             toast({
                 title: "Login failed",
                 description: `Error logging in ${error}`,
                 variant: "destructive"
             })
+        }
+        finally {
+          setFormSubmitting(false);
         }
       };
 
