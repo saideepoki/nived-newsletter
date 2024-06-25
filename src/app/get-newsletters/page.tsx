@@ -47,13 +47,12 @@ export default function Page() {
     <div className="flex bg-zinc-950 text-white min-h-screen mt-3">
       {/* Left side - Master List */}
       <div className="w-1/3 p-4 border-r border-zinc-800">
-        <h1 className="text-2xl font-bold mb-4">Newsletters</h1>
         <input
           type="text"
           placeholder="Search..."
           value={searchTerm}
           onChange={handleSearchChange}
-          className="w-full p-2 mb-4 rounded-lg border border-zinc-500 bg-zinc-950 text-white"
+          className="w-full p-2 mt-10 mb-6 rounded-lg border border-zinc-500 bg-zinc-950 text-white"
         />
         <ul className="space-y-4 max-h-[calc(100vh-10rem)] overflow-y-auto">
           {filteredNewsLetters.map((newsletter) => (
