@@ -1,28 +1,41 @@
+
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 import { dbConnect } from "@/lib/dbConnect";
 import User from "@/model/user";
+import NextAuth from "next-auth";
+
 
 export const authOptions: NextAuthOptions = {
    providers: [
     CredentialsProvider({
-        id: 'sign-in',
         credentials: {
-            email: { label: "email", type: "text"},
+            identifier: { label: "Email / Username", type: "text"},
           },
-        async authorize(credentials: any): Promise<any> {
+        async authorize(credentials: any) {
+            console.log("hurrra")
             await dbConnect();
             try {
-                const user = await User.findOne({email: credentials.email});
+                console.log("login try");
+                const user = await User.findOne({
+                    $or: [
+                        {email: credentials.identifier},
+                        {username: credentials.identifier}
+                    ]
+                });
                 if(!user) {
-                    return null;
+                    console.log("!user")
+                    throw new Error("No user found")
                 }
                 if(!user.isVerified) {
+                    console.log("!user.isVerified");
                     throw new Error("Please Verify your account before login");
                 }
+                console.log("login success");
+                console.log(user);
                 return user;
-            } catch (error) {
-                return null;
+            } catch (error: any) {
+                throw new Error(error);
             }
         },
      }),
@@ -36,17 +49,23 @@ export const authOptions: NextAuthOptions = {
    callbacks: {
 
     async jwt({ token, user}) {
+        if(user) {
         token._id = user._id?.toString();
+        token.username = user.username;
         token.isVerified = user.isVerified;
+        }
         return token;
       },
     async session({ session, user, token }) {
         if(token) {
             session.user._id = token._id;
+            session.user.username = token.username;
             session.user.isVerified = token.isVerified;
         }
-        return session
+        return session;
       },
    },
    secret: process.env.NEXTAUTH_SECRET // all above are dependent on this secret value
 }
+
+export default NextAuth(authOptions);

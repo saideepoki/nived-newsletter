@@ -29,7 +29,7 @@ export default function RootLayout({
        {pathname === '/' ? '' : <Logo/>}
       {children}
       <Toaster/>
-      <BackgroundBeams className = "absolute inset-0 z-0 pointer-events-none"/>
+      <BackgroundBeams className = "absolute w-screen left- 0 pointer-events-none"/>
       </body>
       </AuthProvider>
     </html>

@@ -10,13 +10,12 @@ export async function middleware(request: NextRequest) {
       url.pathname.startsWith('/register') ||
       url.pathname.startsWith('/verify')
   ))
-  return NextResponse.redirect(new URL('/home', request.url))
+  return NextResponse.redirect(new URL('/get-newsletters', request.url))
 }
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    '/',
     '/sign-in',
-    '/verify/:path*'
+    '/verify',
   ]
 }

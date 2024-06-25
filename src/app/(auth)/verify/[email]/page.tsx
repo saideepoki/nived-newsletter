@@ -31,14 +31,14 @@ export default function Page() {
     const onSubmit: SubmitHandler<z.infer<typeof verifySchema>> = async (data) => {
         try {
             const response = await axios.post(`/api/verify/`,{
-                email: decodeURIComponent(params.email),
+                email: decodeURIComponent(params?.email ?? ""),
                 code: data.code
             });
             toast({
                 title: "Success",
                 description: response.data.message
             })
-            router.push('/newsletters');
+            router.push('/');
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             const errorMessage = axiosError.response?.data.message ?? "Error Verifying the Otp";
