@@ -2,6 +2,9 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // Define the Page component
 export default function Page() {
@@ -10,6 +13,7 @@ export default function Page() {
   const [filteredNewsLetters, setFilteredNewsLetters] = useState<any[]>([]);
   const [selectedNewsletter, setSelectedNewsletter] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const {data: session} = useSession();
 
   // Function to fetch newsletters from API
   useEffect(() => {
@@ -42,7 +46,19 @@ export default function Page() {
     setFilteredNewsLetters(filtered);
   };
 
-  // JSX to render the component
+  if(!session) {
+    return (
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col justify-center items-center">
+        <h2 className = "font-extrabold text-3xl mb-6 text-center">
+        Please sign in to get access to the Newsletter list
+        </h2>
+        <Link href = "/sign-in">
+          <Button className = "px-9 py-4 text-md">Login</Button>
+        </Link>
+      </div>
+    )
+  }
+
   return (
     <div className="flex bg-zinc-950 text-white min-h-screen mt-3">
       {/* Left side - Master List */}
