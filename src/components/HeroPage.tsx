@@ -10,9 +10,14 @@ export default function HeroPage() {
         <p className="font-bold text-wrap max-w-[45rem] text-center">
         Macroeconomic insights driving stocks and crypto.
         </p>
-      <Link href = "/register">
-      <Button size="lg" className="text-md">Subscribe</Button>
-      </Link>
+      <div className = "flex justify-center items-center">
+        <Link href = "/register">
+          <Button size="lg" className="text-md mr-5">Subscribe</Button>
+        </Link>
+        <Link href = "/get-newsletters">
+          <Button size="lg" className="text-md">Newsletters</Button>
+        </Link>
+      </div>
      </div>
     );
 }
