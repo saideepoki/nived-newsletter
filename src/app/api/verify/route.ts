@@ -1,5 +1,6 @@
 import User from "@/model/user";
 import { dbConnect } from "@/lib/dbConnect";
+import crypto from 'crypto';
 
 export async function POST(req: Request) {
     await dbConnect();
@@ -19,11 +20,13 @@ export async function POST(req: Request) {
             }
         )
     }
-    const isUserValid = user.verifyCode === code;
+    const hashedOtp = crypto.createHash('sha256').update(code).digest('hex');
+    const isUserValid = user.verifyCode === hashedOtp;
     const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date(Date.now());
     if(isUserValid && isCodeNotExpired) {
         user.isVerified = true;
         await user.save();
+        console.log("user saved");
         return Response.json(
             {
                 success: true,
@@ -37,7 +40,7 @@ export async function POST(req: Request) {
         return Response.json(
             {
                 success: false,
-                message: "Invalid code. Please try to register again"
+                message: "Invalid code. Please enter the correct code"
             },
             {
                 status: 501

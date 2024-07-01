@@ -4,8 +4,8 @@ export interface UserDocument extends Document {
     username: string;
     email: string;
     role: string;
-    verifyCode: string;
-    verifyCodeExpiry: Date;
+    verifyCode?: string;
+    verifyCodeExpiry?: Date;
     isVerified: boolean;
 }
 
@@ -27,11 +27,11 @@ const UserSchema: Schema<UserDocument> = new Schema({
  },
  verifyCode: {
     type: String,
-    required: [true, "Verify Code is required"]
+    required: false
  },
  verifyCodeExpiry: {
     type: Date,
-    required: [true, "Verify Code Expiry is required"]
+    required: false
  },
  isVerified: {
     type: Boolean,

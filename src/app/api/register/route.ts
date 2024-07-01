@@ -1,6 +1,7 @@
 import User from "@/model/user";
 import { dbConnect } from "@/lib/dbConnect";
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
+import crypto from 'crypto';
 
 export async function POST(req: Request, res: Response) {
     await dbConnect();
@@ -28,6 +29,7 @@ export async function POST(req: Request, res: Response) {
         const existingUserVerification = await User.findOne({email});
 
         const verifyCode = Math.floor(100000 + Math.random()*90000).toString();
+        const otpHash = crypto.createHash('sha256').update(verifyCode).digest('hex');
         if(existingUserVerification) {
            if(existingUserVerification.isVerified) {
              return Response.json(
@@ -41,18 +43,18 @@ export async function POST(req: Request, res: Response) {
              )
            }
            else {
-             existingUserVerification.verifyCode = verifyCode;
-             existingUserVerification.verifyCodeExpiry = new Date(Date.now() + 3600000);
+             existingUserVerification.verifyCode = otpHash;
+             existingUserVerification.verifyCodeExpiry = new Date(Date.now() + 10*60*1000);
              await existingUserVerification.save();
            }
         } else {
-            const codeExpiry = new Date(Date.now() + 3600000);
+            const codeExpiry = new Date(Date.now() + 10*60*1000);
 
             const newUser = new User({
                 username: username,
                 email: email,
                 role: 'user',
-                verifyCode: verifyCode,
+                verifyCode: otpHash,
                 verifyCodeExpiry: codeExpiry,
                 isVerified: false,
             });
