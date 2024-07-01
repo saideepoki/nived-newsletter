@@ -3,18 +3,17 @@ import { dbConnect } from "@/lib/dbConnect";
 import { sendNewsLetter } from "@/helpers/sendNewsletter";
 import NewsLetter from "@/model/newsletter";
 
+
 export async function POST(req: Request): Promise<any> {
     await dbConnect();
 
     try {
         const {title, content} = await req.json();
-
         const newsLetter = new NewsLetter({
             title: title,
             content: content,
             createdAt: Date.now()
         })
-
         await newsLetter.save();
 
         const verifiedUsers = await User.find({isVerified: true});
@@ -60,7 +59,7 @@ export async function POST(req: Request): Promise<any> {
         return Response.json(
             {
                 success: false,
-                message: "Error sending newsletters "
+                message: "Error posting newsletters "
             },
             {
                 status: 500

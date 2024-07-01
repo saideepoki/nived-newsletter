@@ -35,19 +35,7 @@ const DarkNewsletterEmail = ({ title, content }: NewsLetterMail) => {
                   {title}
                 </Text>
                 <Hr />
-                <Markdown
-                  markdownCustomStyles={{
-                    h1: { color: "#f0f0f0" },
-                    h2: { color: "c0c0c0" },
-                    codeInline: { background: "grey" },
-                  }}
-                  markdownContainerStyles={{
-                    padding: "12px",
-                    border: "solid 1px black",
-                  }}
-                >
-                  {content}
-                </Markdown>
+                <div dangerouslySetInnerHTML={{ __html: content }}/>
               </Column>
             </Row>
           </Section>

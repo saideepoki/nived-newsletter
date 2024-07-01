@@ -41,9 +41,16 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
         getFeaturedNewsLetters();
     },[])
 
-    function truncateText(content: string): string {
-        if(content.length < 100) return content;
-        return content.slice(0,100) + '...';
+    function truncateText(html: string): string {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        const text = div.textContent || div.innerText
+        if(text.length < 100) return html;
+
+        const truncatedText = text.slice(0,100) + '...'
+        div.textContent = truncatedText
+        return div.innerHTML;
+
     }
 
   return (
@@ -55,9 +62,7 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
             <CardDescription>{new Date(newsletter.createdAt).toLocaleDateString()}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {truncateText(newsletter.content)}
-            </p>
+            <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: truncateText(newsletter.content)}}/>
           </CardContent>
           <CardFooter>
             <Link href={`/newsletter/${newsletter._id}`} >

@@ -6,7 +6,7 @@ import { usernameValidation } from "@/schemas/registerSchema";
 
 export async function GET(req: Request): Promise<any> {
     await dbConnect();
-
+    
     try {
         const {searchParams} = new URL(req.url);
         const queryParam = {

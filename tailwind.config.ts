@@ -27,6 +27,18 @@ const config = {
       },
     },
     extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            ul: {
+              color: 'zinc'
+            },
+            ol: {
+              color: 'zinc'
+            }
+          }
+        }
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -83,7 +95,7 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'),addVariablesForColors,nextui()],
+  plugins: [require('tailwindcss-animate'),addVariablesForColors,nextui(),require('@tailwindcss/typography')],
 } satisfies Config
 
 function addVariablesForColors({ addBase, theme }: any) {
