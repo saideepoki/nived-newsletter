@@ -3,6 +3,7 @@ import mongoose, {Schema,Document} from "mongoose";
 export interface UserDocument extends Document {
     username: string;
     email: string;
+    password: string;
     role: string;
     verifyCode?: string;
     verifyCodeExpiry?: Date;
@@ -20,6 +21,10 @@ const UserSchema: Schema<UserDocument> = new Schema({
   required: [true, "Email is required"],
   unique: true,
   match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,"Please use a valid email address"],
+ },
+ password: {
+   type: String,
+   required: [true, "Password is required"]
  },
  role: {
    type: String,

@@ -4,6 +4,7 @@ import { NextAuthOptions } from "next-auth";
 import { dbConnect } from "@/lib/dbConnect";
 import User from "@/model/user";
 import NextAuth from "next-auth";
+import bcrypt from 'bcrypt';
 
 
 export const authOptions: NextAuthOptions = {
@@ -11,6 +12,7 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
         credentials: {
             identifier: { label: "Email / Username", type: "text"},
+            password: {label: "Password", type: "text"}
           },
         async authorize(credentials: any) {
             console.log("hurrra")
@@ -31,7 +33,10 @@ export const authOptions: NextAuthOptions = {
                     console.log("!user.isVerified");
                     throw new Error("Please Verify your account before login");
                 }
-                console.log("login success");
+                const isPasswordValid = await bcrypt.compare(credentials.password,user.password)
+                if(!isPasswordValid) {
+                    throw new Error("Incorrect password");
+                }
                 console.log(user);
                 return user;
             } catch (error: any) {

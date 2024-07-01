@@ -2,12 +2,14 @@ import User from "@/model/user";
 import { dbConnect } from "@/lib/dbConnect";
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
 import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 export async function POST(req: Request, res: Response) {
     await dbConnect();
 
     try {
-        const {username ,email} = await req.json();
+        const {username ,email, password} = await req.json();
+        console.log(password);
 
         const existingUserVerifiedByUsername = await User.findOne({
             username,
@@ -35,7 +37,7 @@ export async function POST(req: Request, res: Response) {
              return Response.json(
                 {
                     success: false,
-                    message: "email id already exists and verified"
+                    message: "email id already exists and verified. Please login"
                 },
                 {
                     status: 500
@@ -43,16 +45,22 @@ export async function POST(req: Request, res: Response) {
              )
            }
            else {
+             const salt = await bcrypt.genSalt(10);
+             const hashedPassword = await bcrypt.hash(password, salt);
              existingUserVerification.verifyCode = otpHash;
              existingUserVerification.verifyCodeExpiry = new Date(Date.now() + 10*60*1000);
+             existingUserVerification.password = hashedPassword;
              await existingUserVerification.save();
            }
         } else {
             const codeExpiry = new Date(Date.now() + 10*60*1000);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
 
             const newUser = new User({
                 username: username,
                 email: email,
+                password: hashedPassword,
                 role: 'user',
                 verifyCode: otpHash,
                 verifyCodeExpiry: codeExpiry,

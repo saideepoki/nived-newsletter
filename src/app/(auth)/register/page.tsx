@@ -1,25 +1,32 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import * as z from 'zod';
+import { useEffect, useState } from "react";
+import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from 'axios';
-import { AxiosError } from 'axios';
-import { useRouter } from 'next/navigation';
-import { ApiResponse } from '@/types/apiResponse';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { registerSchema } from '@/schemas/registerSchema';
-import { useDebounceCallback } from 'usehooks-ts'
+import axios from "axios";
+import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import { ApiResponse } from "@/types/apiResponse";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { registerSchema } from "@/schemas/registerSchema";
+import { useDebounceCallback } from "usehooks-ts";
 
 export default function Page() {
-  const [username, setUsername] = useState('');
-  const [usernameMessage, setUsernameMessage] = useState('');
+  const [username, setUsername] = useState("");
+  const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
   const debounced = useDebounceCallback(setUsername, 500);
@@ -30,20 +37,24 @@ export default function Page() {
     defaultValues: {
       username: "",
       email: "",
-    }
+      password: ""
+    },
   });
 
   useEffect(() => {
     async function checkUsername() {
       if (username) {
         setIsCheckingUsername(true);
-        setUsernameMessage('');
+        setUsernameMessage("");
         try {
-          const response = await axios.get(`/api/checkUsernameUnique?username=${username}`);
+          const response = await axios.get(
+            `/api/checkUsernameUnique?username=${username}`
+          );
           setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError<ApiResponse>;
-          const usernameError = axiosError.response?.data.message ?? "Error checking username";
+          const usernameError =
+            axiosError.response?.data.message ?? "Error checking username";
           setUsernameMessage(usernameError);
         } finally {
           setIsCheckingUsername(false);
@@ -51,13 +62,15 @@ export default function Page() {
       }
     }
     checkUsername();
+  }, [username]);
 
-  }, [username])
-
-  const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (
+    data
+  ) => {
     setFormSubmitting(true);
     try {
-      const response = await axios.post('/api/register', data);
+      console.log(data);
+      const response = await axios.post("/api/register", data);
       toast({
         title: "Success",
         description: response.data.message,
@@ -66,7 +79,8 @@ export default function Page() {
     } catch (error) {
       console.error("Error Signing up user");
       const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError.response?.data.message ?? "Error Registering the user";
+      const errorMessage =
+        axiosError.response?.data.message ?? "Error Registering the user";
       toast({
         title: "Sign up failed",
         variant: "destructive",
@@ -81,8 +95,13 @@ export default function Page() {
     <div className="flex justify-center items-center min-h-screen bg-zinc-950 text-white p-6">
       <div className="bg-black rounded-large p-8 text-white w-full max-w-md">
         <div className="flex flex-col justify-center items-center mb-5">
-          <h2 className="font-extrabold tracking-tight text-3xl mb-3 text-white">Join Our Newsletter!</h2>
-          <p className="text-white text-center">Register now to receive the latest newsletters directly in your inbox.</p>
+          <h2 className="font-extrabold tracking-tight text-3xl mb-3 text-white">
+            Join Our Newsletter!
+          </h2>
+          <p className="text-white text-center">
+            Register now to receive the latest newsletters directly in your
+            inbox.
+          </p>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -99,12 +118,21 @@ export default function Page() {
                         placeholder="username"
                         {...field}
                         onChange={(e) => {
-                          field.onChange(e)
-                          debounced(e.target.value)}}
+                          field.onChange(e);
+                          debounced(e.target.value);
+                        }}
                         className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
-                      {isCheckingUsername && <Loader2 className='absolute right-2 top-2 h-5 w-5 animate-spin' />}
-                      <p className={`text-sm mt-1 ${usernameMessage === "Username is available" ? 'text-green-500' : 'text-red-500'}`}>
+                      {isCheckingUsername && (
+                        <Loader2 className="absolute right-2 top-2 h-5 w-5 animate-spin" />
+                      )}
+                      <p
+                        className={`text-sm mt-1 ${
+                          usernameMessage === "Username is available"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
                         {usernameMessage}
                       </p>
                     </div>
@@ -132,6 +160,24 @@ export default function Page() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="password"
+                      {...field}
+                      className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex flex-col items-center">
               <Button
                 type="submit"
@@ -151,7 +197,7 @@ export default function Page() {
         </Form>
         <div className="text-center mt-4">
           <p>
-            Already registered?{' '}
+            Already registered?{" "}
             <Link href="/sign-in" className="text-zinc-500">
               Log in
             </Link>
