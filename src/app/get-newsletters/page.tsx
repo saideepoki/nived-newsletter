@@ -89,7 +89,7 @@ export default function Page() {
           <div>
             <h1 className="text-2xl font-bold mb-4">{selectedNewsletter.title}</h1>
             <p className="text-gray-300">{new Date(selectedNewsletter.createdAt).toLocaleDateString()}</p>
-            <p className="mt-2">{selectedNewsletter.content}</p>
+            <p className="mt-2" dangerouslySetInnerHTML={{__html: selectedNewsletter.content}}/>
           </div>
         ) : (
           <p className="text-gray-300">Select a newsletter to view details</p>

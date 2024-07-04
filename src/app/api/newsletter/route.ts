@@ -28,7 +28,7 @@ export async function POST(req: Request): Promise<any> {
         }
 
         const emailPromises = verifiedUsers.map((user) => (
-           sendNewsLetter(title, content,user.email)
+           sendNewsLetter(title, content, user.email)
         ))
 
         // Promise.all to wait for all promises to resolve

@@ -21,6 +21,7 @@ import {
   Highlighter,
   Italic,
   ListOrderedIcon,
+  Loader2,
   PilcrowIcon,
   Quote,
   Redo2,
@@ -47,11 +48,26 @@ import { Input } from "@/components/ui/input";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/apiResponse";
 import DOMPurify from 'dompurify';
+import { Trykker } from "next/font/google";
 
 export default function Page() {
   const form = useForm();
-  const [isPostSubmitting, isSetPostSubmitting] = useState(false);
+  const [isPostSubmitting, SetIsPostSubmitting] = useState(false);
   const { toast } = useToast();
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Store Cloudinary URLs
+
+  // Helper function to upload an image to Cloudinary
+async function uploadImage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'cmb7mj51'); // Replace with your upload preset
+  const response = await axios.post(
+    `https://api.cloudinary.com/v1_1/dcnsxurw2/image/upload`, // Replace with your Cloudinary URL
+    formData
+  );
+  return response.data.secure_url;
+}
+
 
   const extensions = [
     Document,
@@ -71,47 +87,48 @@ export default function Page() {
     ImageResize,
     FileHandler.configure({
       allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp"],
-      onDrop: (currentEditor, files, pos) => {
-        files.forEach((file) => {
-          const fileReader = new FileReader();
-          fileReader.readAsDataURL(file);
-          fileReader.onload = () => {
-            currentEditor
-              .chain()
-              .insertContentAt(pos, {
-                type: "image",
-                attrs: {
-                  src: fileReader.result,
-                },
-              })
-              .focus()
-              .run();
-          };
-        });
+      onDrop: async (currentEditor, files, pos) => {
+        console.log("hi");
+        for (const file of files) {
+          try {
+            const imageUrl = await uploadImage(file);
+            currentEditor.chain().insertContentAt(pos, {
+              type: "image",
+              attrs: {
+                src: imageUrl,
+              },
+            }).focus().run();
+            setUploadedImages((prev) => [...prev, imageUrl]);
+            console.log("Images uploaded")
+          } catch (error) {
+            console.error("Error uploading image:", error);
+          }
+        }
       },
       onPaste: (currentEditor, files, htmlContent) => {
         files.forEach((file) => {
-          if (htmlContent) {
-            // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
-            // you could extract the pasted file from this url string and upload it to a server for example
-            console.log(htmlContent); // eslint-disable-line no-console
-            return false;
-          }
-
           const fileReader = new FileReader();
 
           fileReader.readAsDataURL(file);
-          fileReader.onload = () => {
-            currentEditor
+          fileReader.onload = async () => {
+            try {
+              const imageUrl = await uploadImage(file);
+              currentEditor
               .chain()
               .insertContentAt(currentEditor.state.selection.anchor, {
                 type: "image",
                 attrs: {
-                  src: fileReader.result,
+                  src: imageUrl,
                 },
               })
               .focus()
               .run();
+              setUploadedImages((prev) => [...prev, imageUrl]);
+              console.log("Images uploaded")
+
+            } catch (error) {
+              console.error("Error uploading image:", error);
+            }
           };
         });
       },
@@ -131,15 +148,33 @@ export default function Page() {
     return null;
   }
 
+  // editor.on('update', () => {
+  //   const currentContent = editor.getHTML();
+  //   const currentImages = Array.from(new DOMParser().parseFromString(currentContent, 'text/html').images)
+  //     .map(img => img.src);
+
+  //   // Find removed images
+  //   const removedImages = uploadedImages.filter(url => !currentImages.includes(url));
+
+  //   removedImages.forEach(async (url) => {
+  //     try {
+  //       await axios.post('/api/cloudinary-delete', { url });
+  //       setUploadedImages(prev => prev.filter(img => img !== url));
+  //       console.log("removed images")
+  //     } catch (error) {
+  //       console.error("Error deleting image:", error);
+  //     }
+  //   });
+  // });
+
   async function onSubmit(data: any) {
-    // TODO:
-    console.log(data);
     const html = editor?.getHTML();
     const sanitizedContent = html ? DOMPurify.sanitize(html) : '';
     const { title } = data;
-    console.log(title)
+    console.log(sanitizedContent)
 
     try {
+      SetIsPostSubmitting(true);
       const response = await axios.post("/api/newsletter", {
         title: title,
         content: sanitizedContent,
@@ -165,6 +200,9 @@ export default function Page() {
         variant: "destructive",
         description: errorMessage,
       });
+    }
+    finally{
+      SetIsPostSubmitting(false);
     }
   }
 
@@ -226,7 +264,7 @@ export default function Page() {
             )}
           />
           <div className="w-full bg-zinc-950 rounded-md p-4 shadow-md flex-1 overflow-auto mb-4"> 
-            <EditorContent editor={editor} />
+            <EditorContent editor={editor}/>
           </div>
           <Button
             className="bg-zinc-950 hover:bg-zinc-800 text-white"
@@ -234,6 +272,12 @@ export default function Page() {
           >
             Post
           </Button>
+          {isPostSubmitting && (
+            <div className = "flex items-center mt-3 text-zinc-950">
+              <Loader2 className=" h-5 w-5 animate-spin mr-2"/>
+              <span>Please wait</span>
+            </div>
+          )}
         </form>
       </Form>
     </div>

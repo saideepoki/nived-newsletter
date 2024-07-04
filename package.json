@@ -49,6 +49,7 @@
     "mongoose": "^8.4.3",
     "next": "14.2.4",
     "next-auth": "^4.24.7",
+    "next-cloudinary": "^6.6.2",
     "nodemailer": "^6.9.14",
     "react": "^18",
     "react-dom": "^18",
