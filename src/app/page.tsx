@@ -2,6 +2,7 @@ import { BackgroundBeams } from "@/components/ui/background-beams";
 import HeroPage from "@/components/HeroPage";
 import NavBar from "@/components/NavBar";
 import FeaturedNewsLetters from "@/components/FeaturedNewsletters";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
      <NavBar/>
      <HeroPage/>
      <FeaturedNewsLetters/>
+     <Footer/>
     </main>
   );
 }

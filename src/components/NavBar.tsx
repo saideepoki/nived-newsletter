@@ -36,16 +36,12 @@ export default function NavBar() {
                             Featured
                         </Link>
                     </NavbarItem>
-                    <NavbarItem isActive className="font-semibold">
-                        <Link href="#" aria-current="page">
-                            Contact Me
-                        </Link>
-                    </NavbarItem>
+
                 </NavbarContent>
                 <NavbarContent justify="end">
                     <NavbarItem>
                         {session ? (
-                            <div className="flex items-center">
+                            <div className="flex items-center ml-8">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                     <Avatar>
@@ -63,7 +59,7 @@ export default function NavBar() {
                                 </DropdownMenu>
                             </div>
                         ) : (
-                            <Link href="/sign-in">
+                            <Link className = "ml-8" href="/sign-in">
                                 <Button>
                                     Log in
                                 </Button>
