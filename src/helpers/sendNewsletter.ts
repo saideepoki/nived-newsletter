@@ -9,7 +9,6 @@ export async function sendNewsLetter(
     email: string
 ): Promise<ApiResponse> {
     const newsletterHtml = render(DarkNewsletterEmail({title, content}));
-    console.log(newsletterHtml);
     const options = {
         from: 'deeps2657@gmail.com',
         to: email,

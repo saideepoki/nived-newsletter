@@ -31,7 +31,7 @@ const DarkNewsletterEmail = ({ title, content }: NewsLetterMail) => {
           <Section>
             <Row>
               <Column>
-                <Text className="text-3xl font-bold text-gray-100">
+                <Text className="text-3xl font-bold">
                   {title}
                 </Text>
                 <Hr />

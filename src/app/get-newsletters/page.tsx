@@ -1,100 +1,181 @@
 "use client";
 
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import axios from "axios";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2, Search, Mail } from "lucide-react";
 
-// Define the Page component
-export default function Page() {
-  // State to hold newsletters, search term, and selected newsletter
-  const [newsLetters, setNewsLetters] = useState<any[]>([]);
-  const [filteredNewsLetters, setFilteredNewsLetters] = useState<any[]>([]);
-  const [selectedNewsletter, setSelectedNewsletter] = useState<any | null>(null);
+interface Newsletter {
+  _id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
+export default function NewsletterPage() {
+  const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
+  const [filteredNewsletters, setFilteredNewsletters] = useState<Newsletter[]>([]);
+  const [selectedNewsletter, setSelectedNewsletter] = useState<Newsletter | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const {data: session} = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+  const { data: session } = useSession();
 
-  // Function to fetch newsletters from API
   useEffect(() => {
-    async function getNewsletters() {
+    async function fetchNewsletters() {
       try {
-        const response = await axios.get('/api/getNewsletters');
-        setNewsLetters(response.data.message);
-        setFilteredNewsLetters(response.data.message); // Initialize filtered list
+        const response = await axios.get<{ message: Newsletter[] }>('/api/getNewsletters');
+        setNewsletters(response.data.message);
+        setFilteredNewsletters(response.data.message);
       } catch (error) {
         console.error('Error fetching newsletters:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
-    getNewsletters();
+    fetchNewsletters();
   }, []);
 
-  // Function to handle selecting a newsletter
-  const handleNewsletterClick = (newsletter: any) => {
+  const handleNewsletterClick = (newsletter: Newsletter) => {
     setSelectedNewsletter(newsletter);
   };
 
-  // Function to handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
 
-    const filtered = newsLetters.filter(newsletter =>
+    const filtered = newsletters.filter(newsletter =>
       newsletter.title.toLowerCase().includes(term) ||
       newsletter.content.toLowerCase().includes(term)
     );
-    setFilteredNewsLetters(filtered);
+    setFilteredNewsletters(filtered);
   };
 
-  if(!session) {
+  if (!session) {
     return (
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col justify-center items-center">
-        <h2 className = "font-extrabold text-3xl mb-6 text-center">
-        Please sign in to get access to the Newsletter list
-        </h2>
-        <Link href = "/sign-in">
-          <Button className = "px-9 py-4 text-md">Login</Button>
-        </Link>
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-zinc-900 to-black text-white">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-4xl font-bold mb-6 text-center">
+            Welcome to the Newsletter Hub
+          </h2>
+          <p className="text-xl mb-8 text-center text-zinc-300">
+            Please sign in to access your personalized newsletter list
+          </p>
+          <Link href="/sign-in" className="flex justify-center">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 transition-colors">
+              Login to Continue
+            </Button>
+          </Link>
+        </motion.div>
       </div>
-    )
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-zinc-900 to-black text-white">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+      </div>
+    );
   }
 
   return (
-    <div className="flex bg-zinc-950 text-white min-h-screen mt-3">
-      {/* Left side - Master List */}
-      <div className="w-1/3 p-4 border-r border-zinc-800">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="w-full p-2 mt-10 mb-6 rounded-lg border border-zinc-500 bg-zinc-950 text-white"
-        />
-        <ul className="space-y-4 max-h-[calc(100vh-10rem)] overflow-y-auto">
-          {filteredNewsLetters.map((newsletter) => (
-            <li
-              key={newsletter._id}
-              className={`p-2 cursor-pointer ${selectedNewsletter?._id === newsletter._id ? 'bg-zinc-900' : 'hover:bg-zinc-900'}`}
-              onClick={() => handleNewsletterClick(newsletter)}
-            >
-              {newsletter.title}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Right side - Details */}
-      <div className="flex-1 p-4 md: mt-12 lg: mt-15">
-        {selectedNewsletter ? (
-          <div>
-            <h1 className="text-2xl font-bold mb-4">{selectedNewsletter.title}</h1>
-            <p className="text-gray-300">{new Date(selectedNewsletter.createdAt).toLocaleDateString()}</p>
-            <p className="mt-2" dangerouslySetInnerHTML={{__html: selectedNewsletter.content}}/>
+    <div className="flex flex-col lg:flex-row bg-gradient-to-br from-zinc-900 to-black text-white min-h-screen p-6 gap-6 mt-12">
+      <Card className="lg:w-1/3 w-full bg-zinc-800/50 border-zinc-700 backdrop-blur-sm mb-6 lg:mb-0">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <Mail className="w-6 h-6" /> Newsletters
+          </CardTitle>
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Search newsletters..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-10 bg-zinc-700/50 border-zinc-600 focus:border-blue-500 transition-colors"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
           </div>
-        ) : (
-          <p className="text-gray-300">Select a newsletter to view details</p>
-        )}
-      </div>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[calc(100vh-12rem)]">
+            <AnimatePresence>
+              {filteredNewsletters.map((newsletter) => (
+                <motion.div
+                  key={newsletter._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Button
+                    variant="ghost"
+                    className={`w-full justify-start text-left mb-2 ${
+                      selectedNewsletter?._id === newsletter._id
+                        ? 'bg-blue-500/20 text-blue-300'
+                        : 'hover:bg-zinc-700/50'
+                    }`}
+                    onClick={() => handleNewsletterClick(newsletter)}
+                  >
+                    {newsletter.title}
+                  </Button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card className="flex-1 bg-zinc-800/50 border-zinc-700 backdrop-blur-sm overflow-hidden">
+        <CardContent className="p-6 h-full">
+          <AnimatePresence mode="wait">
+            {selectedNewsletter ? (
+              <motion.div
+                key={selectedNewsletter._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="h-full overflow-auto"
+              >
+                <h1 className="text-3xl font-bold mb-2">{selectedNewsletter.title}</h1>
+                <p className="text-sm text-zinc-400 mb-4">
+                  {new Date(selectedNewsletter.createdAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </p>
+                <ScrollArea>
+                <div
+                  className="prose prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: selectedNewsletter.content }}
+                />
+                </ScrollArea>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="h-full flex items-center justify-center"
+              >
+                <p className="text-zinc-400 text-lg">Select a newsletter to view details</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+      </Card>
     </div>
   );
 }

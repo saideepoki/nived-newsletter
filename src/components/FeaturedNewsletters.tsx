@@ -65,7 +65,7 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
             <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: truncateText(newsletter.content)}}/>
           </CardContent>
           <CardFooter>
-            <Link href={`/newsletter/${newsletter._id}`} >
+            <Link href={`/get-newsletters`} >
             <Button className="w-full">
               <CheckIcon className="mr-2 h-4 w-4" /> Read More
             </Button>
