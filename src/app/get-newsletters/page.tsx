@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Search, Mail } from "lucide-react";
+import { Loader2, Search, Mail, ChevronDown } from "lucide-react";
 
 interface Newsletter {
   _id: string;
@@ -89,8 +89,8 @@ export default function NewsletterPage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row bg-gradient-to-br from-zinc-900 to-black text-white min-h-screen p-6 gap-6 mt-12">
-      <Card className="lg:w-1/3 w-full bg-zinc-800/50 border-zinc-700 backdrop-blur-sm mb-6 lg:mb-0">
+    <div className="flex flex-col lg:flex-row bg-gradient-to-br from-zinc-900 to-black text-white min-h-screen p-6 gap-6 mt-12 relative">
+      <Card className="lg:w-1/3 w-full bg-zinc-800/50 border-zinc-700 backdrop-blur-sm mb-6 lg:mb-0 relative">
         <CardHeader>
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
             <Mail className="w-6 h-6" /> Newsletters
@@ -107,7 +107,7 @@ export default function NewsletterPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[calc(100vh-12rem)]">
+          <ScrollArea className="h-[calc(100vh-12rem)] relative">
             <AnimatePresence>
               {filteredNewsletters.map((newsletter) => (
                 <motion.div
@@ -131,6 +131,10 @@ export default function NewsletterPage() {
                 </motion.div>
               ))}
             </AnimatePresence>
+            {/* Scroll down indicator */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 lg:hidden">
+              <ChevronDown className="w-6 h-6 animate-bounce text-zinc-400" />
+            </div>
           </ScrollArea>
         </CardContent>
       </Card>
