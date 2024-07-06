@@ -18,7 +18,6 @@ export const authOptions: NextAuthOptions = {
             console.log("hurrra")
             await dbConnect();
             try {
-                console.log("login try");
                 const user = await User.findOne({
                     $or: [
                         {email: credentials.identifier},
@@ -37,7 +36,6 @@ export const authOptions: NextAuthOptions = {
                 if(!isPasswordValid) {
                     throw new Error("Incorrect password");
                 }
-                console.log(user);
                 return user;
             } catch (error: any) {
                 throw new Error(error);
@@ -66,6 +64,7 @@ export const authOptions: NextAuthOptions = {
         if(token) {
             session.user._id = token._id;
             session.user.username = token.username;
+            session.user.role = token.role;
             session.user.isVerified = token.isVerified;
         }
         return session;

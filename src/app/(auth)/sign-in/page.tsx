@@ -20,11 +20,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { z } from "zod";
+import { User } from "next-auth";
+import { getSession } from "next-auth/react";
+
 
 export default function LoginPage() {
   const [formSubmitting, setFormSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const session = getSession();
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -37,12 +41,11 @@ export default function LoginPage() {
   const onSubmit: SubmitHandler<z.infer<typeof loginSchema>> = async (data) => {
     setFormSubmitting(true);
     try {
-      const response = await signIn("credentials", {
+      const response = await signIn<any>("credentials", {
         redirect: false,
         identifier: data.identifier,
         password: data.password,
       });
-      console.log(response);
       if (response?.error) {
         toast({
           title: "Login failed",
@@ -58,7 +61,7 @@ export default function LoginPage() {
           description: "Redirecting to view Newsletters",
           variant: "default",
         });
-        router.push("/get-newsletters");
+        router.push('/get-newsletters');
       }
     } catch (error) {
       toast({
