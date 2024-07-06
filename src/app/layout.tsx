@@ -7,7 +7,8 @@ import AuthProvider from "@/helpers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster"
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import Logo from "@/components/Logo";
-import { usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation';
+import NavBar from "@/components/NavBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,7 @@ export default function RootLayout({
     <html lang="en" className = "dark">
       <AuthProvider>
       <body className={inter.className}>
-       {pathname === '/' ? '' : <Logo/>}
+       {pathname === '/' ? <NavBar/> : <Logo/>}
       {children}
       <Toaster/>
       {pathname !== '/post-newsletter' &&  <BackgroundBeams className = "absolute w-screen left- 0 pointer-events-none"/>}

@@ -1,6 +1,6 @@
 import { NewsletterDocument } from "@/model/newsletter";
 export interface ApiResponse {
-    success: boolean;
-    message: string;
-    newsletters?: Array<NewsletterDocument>;
+  success: boolean;
+  message: string;
+  newsletters?: Array<NewsletterDocument>;
 }

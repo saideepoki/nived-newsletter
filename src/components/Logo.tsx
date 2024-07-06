@@ -3,7 +3,6 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
 
 export default function Logo() {
     const {data: session, status} = useSession();
@@ -31,6 +30,13 @@ export default function Logo() {
                                     <DropdownMenuContent className="bg-zinc-950">
                                     <DropdownMenuLabel>{user?.username || user?.email}</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
+                                    {user?.role === 'admin' && (
+                                        <DropdownMenuItem>
+                                            <Link href="/dashboard">
+                                                Dashboard
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
                                     <DropdownMenuItem className = "text-red-500" onClick = {() => signOut({callbackUrl: "/"})}>
                                         Logout
                                     </DropdownMenuItem>
