@@ -38,6 +38,7 @@ export default function NewsletterPage() {
         setIsLoading(false);
       }
     }
+    
     fetchNewsletters();
   }, []);
 

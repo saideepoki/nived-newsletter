@@ -10,7 +10,14 @@ export async function middleware(request: NextRequest) {
       url.pathname.startsWith('/register') ||
       url.pathname.startsWith('/verify')
   ))
-  return NextResponse.redirect(new URL('/get-newsletters', request.url))
+  return NextResponse.redirect(new URL('/get-newsletters', request.url));
+
+  if(token?.role !== 'admin' && (
+      url.pathname.startsWith('/post-newsletter') ||
+      url.pathname.startsWith('/delete-newsletters') ||
+      url.pathname.startsWith('/dashboard')
+  ))
+  return NextResponse.redirect(new URL('/', request.url));
 }
 // See "Matching Paths" below to learn more
 export const config = {

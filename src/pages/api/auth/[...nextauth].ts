@@ -57,6 +57,7 @@ export const authOptions: NextAuthOptions = {
         if(user) {
         token._id = user._id?.toString();
         token.username = user.username;
+        token.role = user.role;
         token.isVerified = user.isVerified;
         }
         return token;

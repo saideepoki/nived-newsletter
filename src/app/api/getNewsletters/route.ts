@@ -1,8 +1,6 @@
 import NewsLetter from "@/model/newsletter";
 import { dbConnect } from "@/lib/dbConnect";
 
-const Websocket = require('ws');
-
 export async function GET(req: Request) {
     await dbConnect();
 
