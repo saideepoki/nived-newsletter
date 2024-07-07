@@ -39,7 +39,7 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
             }
         }
         getFeaturedNewsLetters();
-    },[featuredNewsletters])
+    })
 
     function truncateText(html: string): string {
         const div = document.createElement('div');
@@ -50,7 +50,6 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
         const truncatedText = text.slice(0,100) + '...'
         div.textContent = truncatedText
         return div.innerHTML;
-
     }
 
   return (
