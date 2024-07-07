@@ -2,7 +2,7 @@ import { dbConnect } from "@/lib/dbConnect";
 import { useParams } from "next/navigation";
 import NewsLetter from "@/model/newsletter";
 
-
+export const dynamic = 'force-dynamic';
 export async function POST(req: Request, res: Response) {
     await dbConnect();
     try {
