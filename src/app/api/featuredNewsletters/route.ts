@@ -1,6 +1,7 @@
 import { dbConnect } from "@/lib/dbConnect";
 import NewsLetter from "@/model/newsletter";
 
+export const dynamic = 'force-dynamic';
 export async function GET(req: Request): Promise<any> {
     await dbConnect();
     try {
