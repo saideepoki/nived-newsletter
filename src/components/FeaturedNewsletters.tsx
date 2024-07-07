@@ -39,7 +39,7 @@ export default function FeaturedNewsLetters({ className, ...props }: CardProps) 
             }
         }
         getFeaturedNewsLetters();
-    },[])
+    },[featuredNewsletters])
 
     function truncateText(html: string): string {
         const div = document.createElement('div');
