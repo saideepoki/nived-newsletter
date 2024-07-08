@@ -1,37 +1,60 @@
-import { DuckDuckGoSearch } from "@langchain/community/tools/duckduckgo_search";
-import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
-import { ChatOpenAI } from "@langchain/openai";
-import type { ChatPromptTemplate } from "@langchain/core/prompts";
-import { pull } from "langchain/hub";
-import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
-
+import { ChatMistralAI, MistralAIEmbeddings } from "@langchain/mistralai";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { SerpAPILoader } from "@langchain/community/document_loaders/web/serpapi";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
+import { createRetrievalChain } from "langchain/chains/retrieval";
 export async function POST(req: Request) {
   const { input } = await req.json();
-  const tools = [new TavilySearchResults({ maxResults: 1 })];
-  const prompt = await pull<ChatPromptTemplate>(
-    "hwchase17/openai-functions-agent"
-  );
-  const llm = new ChatOpenAI({
-    model: "gpt-3.5-turbo-1106",
-    temperature: 0,
-    apiKey: process.env.OPENAI_API_KEY
+  const apiKey = process.env.SERP_API_KEY;
+  const query = "blockchain technology, cryptocurrency trends, stock market news 2024";
+  const question = input;
+  const embeddings = new MistralAIEmbeddings();
+
+  // Use SerpAPILoader to load web search results
+const loader = new SerpAPILoader({ q: query, apiKey });
+const docs = await loader.load();
+
+// Use MemoryVectorStore to store the loaded documents in memory
+const vectorStore = await MemoryVectorStore.fromDocuments(docs, embeddings);
+
+// const prompt = await pull<ChatPromptTemplate>("hwchase17/openai-functions-agent");
+const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "Answer the user's questions based on the below context:\n\n{context}",
+  ],
+  ["human", "{input}"],
+]);
+
+  const llm = new ChatMistralAI({
+    model: "mistral-large-latest",
+    maxTokens: 1000
   });
-  const agent = await createOpenAIFunctionsAgent({
+
+  // const agent = await createToolCallingAgent({
+  //   llm,
+  //   tools: tools2,
+  //   prompt,
+  // });
+
+  const combineDocsChain = await createStuffDocumentsChain({
     llm,
-    tools,
-    prompt,
+    prompt: questionAnsweringPrompt,
   });
-  const agentExecutor = new AgentExecutor({
-    agent,
-    tools,
+
+  const chain = await createRetrievalChain({
+    retriever: vectorStore.asRetriever(),
+    combineDocsChain,
   });
+
   try {
     console.log("hi");
-    const result = await agentExecutor.invoke({
-      input: "What is Anthropic's estimated revenue for 2024?",
+    const res = await chain.invoke({
+      input: question,
     });
     console.log("hi2");
-    if (!result) {
+    if (!res) {
       return Response.json(
         {
           success: false,
@@ -46,7 +69,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         success: true,
-        message: result,
+        message: res.answer,
       },
       {
         status: 200,
