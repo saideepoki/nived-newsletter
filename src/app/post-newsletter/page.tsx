@@ -29,6 +29,7 @@ import {
   Ruler,
   Strikethrough,
   Undo2,
+  X,
 } from "lucide-react";
 import { ListBulletIcon } from "@radix-ui/react-icons";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,8 +57,11 @@ import HardBreak from '@tiptap/extension-hard-break'
 export default function Page() {
   const form = useForm();
   const [isPostSubmitting, SetIsPostSubmitting] = useState(false);
+  const [isQuerySubmitting, SetIsQuerySubmitting] = useState(false);
   const { toast } = useToast();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Store Cloudinary URLs
+  const [aiAnswer, setAiAnswer] = useState<string>("");
+  const [showAiAnswer, setShowAiAnswer] = useState(false);
 
   // Helper function to upload an image to Cloudinary
   async function uploadImage(file: File): Promise<string> {
@@ -201,6 +205,32 @@ export default function Page() {
       });
     } finally {
       SetIsPostSubmitting(false);
+    }
+  }
+
+  async function onSubmit2(data: any) {
+    try {
+      SetIsQuerySubmitting(true);
+      const response = await axios.post("/api/searchInternet", data);
+      if(!response.data.success) {
+        toast({
+          title: "Error",
+          variant: "destructive",
+          description: response.data.message
+        })
+      }
+      setAiAnswer(response.data.message);
+      setShowAiAnswer(true);
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message ?? "Error finding the answer";
+      toast({
+        title: "Error",
+        description: errorMessage
+      })
+    }
+    finally {
+      SetIsQuerySubmitting(false);
     }
   }
 
@@ -374,24 +404,22 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Right Sidebar for future AI implementation */}
-      <div className="w-1/3 text-black bg-gray-200 p-8 mt-12">
-        <h2 className="text-xl font-bold">AI Features</h2>
-        <p>Future AI tools and features will be placed here.</p>
+      {/* Right Sidebar for AI features */}
+      <div className="w-1/3 text-black bg-gray-200 p-8 mt-12 relative overflow-hidden">
+        <h2 className="text-xl font-bold">Economical Insights</h2>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit2)}>
             <FormField
               control={form.control}
-              name="bio"
+              name="input"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bio</FormLabel>
+                  <FormLabel>Ask AI</FormLabel>
                   <FormControl>
                     <Textarea
-                      disabled
                       className="text-white bg-zinc-950 mt-5 flex-1 rounded-lg"
-                      rows={15}
-                      placeholder="To be implemented"
+                      rows={5}
+                      placeholder="Ask your question here"
                       {...field}
                     />
                   </FormControl>
@@ -400,15 +428,41 @@ export default function Page() {
               )}
             />
             <Button
-              disabled
               className="mt-5 bg-zinc-950 text-white hover:bg-zinc-800 w-full"
               type="submit"
             >
               Submit
             </Button>
+            {isQuerySubmitting && (
+            <div className="flex items-center justify-center mt-3 text-zinc-950">
+              <Loader2 className="h-5 w-5 animate-spin mr-2"/>
+              <span>Please wait</span>
+            </div>
+          )}
           </form>
         </Form>
+
+        {/* AI Answer Slide */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 bg-white p-4 shadow-md transition-all duration-300 ease-in-out ${
+            showAiAnswer ? "translate-y-0" : "translate-y-full"
+          }`}
+          style={{ maxHeight: "70%", overflowY: "auto" }}
+        >
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">Answer</h3>
+            <Button
+              onClick={() => setShowAiAnswer(false)}
+              variant="ghost"
+              size="sm"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="prose max-w-none">{aiAnswer}</div>
+        </div>
       </div>
+
     </div>
   );
 }
